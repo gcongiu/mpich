@@ -433,6 +433,7 @@ static int generic_init(void)
     int mpi_errno = MPI_SUCCESS;
     MPIDI_global.is_ch4u_initialized = 0;
     MPIDIG_am_init();
+    MPIDIG_gpu_init();
     MPIDIU_map_create((void **) &(MPIDI_global.win_map), MPL_MEM_RMA);
     MPIDI_global.csel_root = NULL;
     MPIDI_global.is_ch4u_initialized = 1;
@@ -669,6 +670,7 @@ static void finalize_av_table(void)
 static void generic_finalize(void)
 {
     MPIDIG_am_finalize();
+    MPIDIG_gpu_finalize();
     MPIDI_global.is_ch4u_initialized = 0;
 }
 

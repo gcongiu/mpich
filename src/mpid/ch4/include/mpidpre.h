@@ -200,6 +200,10 @@ typedef struct MPIDIG_req_t {
     MPI_Datatype datatype;
 } MPIDIG_req_t;
 
+typedef struct MPIDIG_gpu_req_t {
+    void *stage_buf;
+} MPIDIG_gpu_req_t;
+
 /* Structure to capture arguments for pt2pt persistent communications */
 typedef struct MPIDI_prequest {
     MPIDI_ptype p_type;         /* persistent request type */
@@ -219,6 +223,8 @@ typedef struct {
      * ifdefs in the code. */
     struct MPIR_Request *anysource_partner_request;
 #endif
+
+    MPIDIG_gpu_req_t gpu;
 
     union {
         /* The first fields are used by the MPIDIG apis */
@@ -244,6 +250,7 @@ typedef struct {
 #define MPIDI_REQUEST_HDR_SIZE              offsetof(struct MPIR_Request, dev.ch4.netmod)
 #define MPIDI_REQUEST(req,field)       (((req)->dev).field)
 #define MPIDIG_REQUEST(req,field)       (((req)->dev.ch4.am).field)
+#define MPIDIG_GPU_REQUEST(req,field)   (((req)->dev.gpu).field)
 #define MPIDI_PREQUEST(req,field)       (((req)->dev.ch4.preq).field)
 
 #ifdef MPIDI_CH4_USE_WORK_QUEUES
