@@ -18,10 +18,11 @@
    - use huge pages
 */
 
-MPIDIU_buf_pool_t *MPIDIU_create_buf_pool(int num, int size);
+MPIDIU_buf_pool_t *MPIDIU_create_buf_pool(int num, int size, int flags);
 void MPIDIU_destroy_buf_pool(MPIDIU_buf_pool_t * pool);
 
 static inline MPIDIU_buf_pool_t *MPIDIU_create_buf_pool_internal(int num, int size,
+                                                                 int flags,
                                                                  MPIDIU_buf_pool_t * parent_pool)
 {
     int i, ret;
@@ -37,8 +38,13 @@ static inline MPIDIU_buf_pool_t *MPIDIU_create_buf_pool_internal(int num, int si
 
     buf_pool->size = size;
     buf_pool->num = num;
+    buf_pool->flags = flags;
     buf_pool->next = NULL;
-    buf_pool->memory_region = MPL_malloc(num * (sizeof(MPIDIU_buf_t) + size), MPL_MEM_BUFFER);
+    if (flags == MPIDIU_BUF_POOL_PINNED) {
+        MPL_gpu_malloc_host(&buf_pool->memory_region, num * (sizeof(MPIDIU_buf_t) + size));
+    } else {
+        buf_pool->memory_region = MPL_malloc(num * (sizeof(MPIDIU_buf_t) + size), MPL_MEM_BUFFER);
+    }
     MPIR_Assert(buf_pool->memory_region);
 
     curr = (MPIDIU_buf_t *) buf_pool->memory_region;
@@ -87,7 +93,7 @@ static inline void *MPIDIU_get_buf_safe(MPIDIU_buf_pool_t * pool)
     while (curr_pool->next)
         curr_pool = curr_pool->next;
 
-    curr_pool->next = MPIDIU_create_buf_pool_internal(pool->num, pool->size, pool);
+    curr_pool->next = MPIDIU_create_buf_pool_internal(pool->num, pool->size, pool->flags, pool);
     MPIR_Assert(curr_pool->next);
     pool->head = curr_pool->next->head;
     buf = MPIDIU_get_head_buf(pool);

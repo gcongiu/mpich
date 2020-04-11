@@ -20,6 +20,8 @@ enum {
     MPIDI_VCI_RX = 0x2, /* Can receive */
 };
 
+#define MPIDIU_BUF_POOL_PAGEABLE (0)
+#define MPIDIU_BUF_POOL_PINNED (1)
 #define MPIDIU_BUF_POOL_NUM (1024)
 #define MPIDIU_BUF_POOL_SZ (256)
 
@@ -181,6 +183,7 @@ typedef struct MPIDIG_comm_req_list_t {
 typedef struct MPIDIU_buf_pool_t {
     int size;
     int num;
+    int flags;
     void *memory_region;
     struct MPIDIU_buf_pool_t *next;
     struct MPIDIU_buf_t *head;

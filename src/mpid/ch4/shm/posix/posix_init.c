@@ -117,7 +117,8 @@ int MPIDI_POSIX_mpi_init_hook(int rank, int size, int *tag_bits)
 #endif /* MPL_USE_DBG_LOGGING */
 
     MPIDI_POSIX_global.am_buf_pool =
-        MPIDIU_create_buf_pool(MPIDI_POSIX_BUF_POOL_NUM, MPIDI_POSIX_BUF_POOL_SIZE);
+        MPIDIU_create_buf_pool(MPIDI_POSIX_BUF_POOL_NUM, MPIDI_POSIX_BUF_POOL_SIZE,
+                               MPIDIU_BUF_POOL_PAGEABLE);
 
     MPIR_CHKPMEM_DECL(1);
 

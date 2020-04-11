@@ -50,7 +50,8 @@ int MPIDIG_am_init(void)
     MPL_atomic_store_uint64(&MPIDI_global.exp_seq_no, 0);
     MPL_atomic_store_uint64(&MPIDI_global.nxt_seq_no, 0);
 
-    MPIDI_global.buf_pool = MPIDIU_create_buf_pool(MPIDIU_BUF_POOL_NUM, MPIDIU_BUF_POOL_SZ);
+    MPIDI_global.buf_pool =
+        MPIDIU_create_buf_pool(MPIDIU_BUF_POOL_NUM, MPIDIU_BUF_POOL_SZ, MPIDIU_BUF_POOL_PAGEABLE);
     MPIR_Assert(MPIDI_global.buf_pool);
     MPIR_Assert(MPIDIG_HANDLER_STATIC_MAX <= MPIDI_AM_HANDLERS_MAX);
 

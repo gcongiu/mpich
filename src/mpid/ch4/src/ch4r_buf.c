@@ -6,13 +6,13 @@
 #include "mpidimpl.h"
 #include "ch4r_buf.h"
 
-MPIDIU_buf_pool_t *MPIDIU_create_buf_pool(int num, int size)
+MPIDIU_buf_pool_t *MPIDIU_create_buf_pool(int num, int size, int flags)
 {
     MPIDIU_buf_pool_t *buf_pool;
     MPIR_FUNC_VERBOSE_STATE_DECL(MPID_STATE_MPIDIU_CREATE_BUF_POOL);
     MPIR_FUNC_VERBOSE_ENTER(MPID_STATE_MPIDIU_CREATE_BUF_POOL);
 
-    buf_pool = MPIDIU_create_buf_pool_internal(num, size, NULL);
+    buf_pool = MPIDIU_create_buf_pool_internal(num, size, flags, NULL);
 
     MPIR_FUNC_VERBOSE_EXIT(MPID_STATE_MPIDIU_CREATE_BUF_POOL);
     return buf_pool;
@@ -29,7 +29,11 @@ void MPIDIU_destroy_buf_pool(MPIDIU_buf_pool_t * pool)
         MPIDIU_destroy_buf_pool(pool->next);
 
     MPID_Thread_mutex_destroy(&pool->lock, &ret);
-    MPL_free(pool->memory_region);
+    if (pool->flags == MPIDIU_BUF_POOL_PINNED) {
+        MPL_gpu_free_host(pool->memory_region);
+    } else {
+        MPL_free(pool->memory_region);
+    }
     MPL_free(pool);
 
     MPIR_FUNC_VERBOSE_EXIT(MPID_STATE_MPIDIU_DESTROY_BUF_POOL);
